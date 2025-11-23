@@ -1,30 +1,53 @@
+import os
+from dotenv import load_dotenv
 import gradio as gr
+from huggingface_hub import InferenceClient
 
-# Simple chatbot logic
-def chatbot_response(user_input, chat_history):
-    if chat_history is None:
-        chat_history = []
-    
-    # Example response logic (replace with your AI model)
-    response = f"You said: {user_input}"
-    
-    # Append to chat history
-    chat_history.append((user_input, response))
-    return chat_history, ""
+# Load token
+load_dotenv()
+HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
 
-# Define Gradio interface
-with gr.Blocks() as demo:
-    gr.Markdown("## Chatbot UI Example")
-    
-    chatbot = gr.Chatbot()
-    user_input = gr.Textbox(
-        label="Type your message here",
-        placeholder="Enter message...",
-        lines=1
+client = InferenceClient(token=HF_TOKEN)
+llm = "meta-llama/Llama-3.1-8B-Instruct"
+
+
+def chatbot_response(message, history):
+    """
+    message = current user message (string)
+    history = list of dicts: [{"role": "...", "content": "..."}]
+    """
+
+    if history is None:
+        history = []
+
+    # Add user message
+    history.append({"role": "user", "content": message})
+
+    # Send chat history to model
+    completion = client.chat.completions.create(
+        model=llm,
+        messages=history
     )
-    send_btn = gr.Button("Send")
-    
-    # Connect components
-    send_btn.click(chatbot_response, inputs=[user_input, chatbot], outputs=[chatbot, user_input])
-    
+
+    bot_reply = completion.choices[0].message["content"]
+
+    # Add assistant reply
+    history.append({"role": "assistant", "content": bot_reply})
+
+    return "", history
+
+
+with gr.Blocks() as demo:
+    gr.Markdown("## 🦙 LLaMA Chatbot (Gradio 6 + HF InferenceClient)")
+
+    chatbot = gr.Chatbot()   # In Gradio 6 this uses dict-based message history
+    user_input = gr.Textbox(placeholder="Type your message…", label="Your Message")
+    send = gr.Button("Send")
+
+    send.click(
+        chatbot_response,
+        inputs=[user_input, chatbot],
+        outputs=[user_input, chatbot]
+    )
+
 demo.launch(share=True)
