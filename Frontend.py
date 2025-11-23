@@ -27,4 +27,4 @@ with gr.Blocks() as demo:
     # Connect components
     send_btn.click(chatbot_response, inputs=[user_input, chatbot], outputs=[chatbot, user_input])
     
-demo.launch()
+demo.launch(share=True)
