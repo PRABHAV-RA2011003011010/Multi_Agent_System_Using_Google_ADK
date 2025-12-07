@@ -8,7 +8,7 @@ load_dotenv()
 CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID")
 CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI")
-AUTH_CODE = os.getenv("LINKEDIN_AUTH_CODE")
+AUTH_CODE = os.getenv("LINKEDIN_AUTH_TOKEN")
 
 url = "https://www.linkedin.com/oauth/v2/accessToken" 
 
