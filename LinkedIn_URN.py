@@ -1,18 +1,19 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-ACCESS_TOKEN = "LINKEDIN_ACCESS_TOKEN"   # Do NOT hardcode in real apps
+load_dotenv()
 
-url = "https://api.linkedin.com/v2/shares/1234"
-params = {
-    "projection": "(id,owner)"
-}
+ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN")
+
+url = "https://api.linkedin.com/v2/userinfo"
 
 headers = {
-    "Authorization": f"Bearer {ACCESS_TOKEN}",
-    "X-Restli-Protocol-Version": "2.0.0"
+    "Authorization": f"Bearer {ACCESS_TOKEN}"
 }
 
-response = requests.get(url, headers=headers, params=params)
+response = requests.get(url, headers=headers)
 
 print("Status:", response.status_code)
 print("Response:", response.json())
+
